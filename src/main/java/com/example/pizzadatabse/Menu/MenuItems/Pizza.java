@@ -3,12 +3,10 @@ package com.example.pizzadatabse.Menu.MenuItems;
 import java.util.ArrayList;
 
 public class Pizza extends  Item{
-    private String id;
     private boolean isVegeterian = true;
     private ArrayList<Topping> topping;
     public Pizza(String name, ArrayList<Topping> toppings, String id) {
-        super(name, calculatePrice(toppings));
-        this.id = id;
+        super(name, calculatePrice(toppings), id);
         for (int i = 0; i < toppings.size(); i++) {
             if(!toppings.get(i).isVegeterian){
                 isVegeterian = false;
@@ -24,9 +22,7 @@ public class Pizza extends  Item{
         }
         return price;
     }
-    public String getID(){
-        return id;
-    }
+
     public String getIsVegetarian(){
         if(isVegeterian){
             return "Vegetarian";

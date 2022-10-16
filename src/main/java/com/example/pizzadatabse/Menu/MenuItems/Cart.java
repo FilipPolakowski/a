@@ -19,6 +19,9 @@ public class Cart{
         LocalDate date = java.time.LocalDate.now();
 
     }
+    public ArrayList<Item> getOrder(){
+        return dishes;
+    }
     private double calculatePrice(){
         double price = 0;
         for (int i = 0; i < dishes.size(); i++) {
