@@ -20,6 +20,8 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 
 import java.io.IOException;
+import java.sql.PreparedStatement;
+import java.sql.Statement;
 
 public class HelloApplication extends Application {
 
@@ -108,22 +110,42 @@ public class HelloApplication extends Application {
         loginGroup.add(password,1,2);
         loginGroup.add(password2,1,3);
         loginGroup.add(passwordText2, 0, 3);
+        EventHandler<ActionEvent> loggIn = new EventHandler<>() {
+            public void handle(ActionEvent e) {
+
+                if(password2.getText().equals(password.getText())){
+                    try{
+                        String url = "jdbc:mysql://localhost:3306/pizzaapi";
+                        String login = "abc";
+                        String passwords = "password";
+
+                        Connection conn = DriverManager.getConnection(url,login,passwords);
+                        PreparedStatement stmt = conn.prepareStatement("INSERT INTO customer(`username`, `customer_password`, `address`, `phone_number`) VALUES (?,?,?,?)");
+                        stmt.setString(1, username.getText());
+                        stmt.setString(2, password.getText());
+                        stmt.setString(3, "Franek");
+                        stmt.setString(4, "504020123");
+
+
+
+                        stmt.executeUpdate();
+
+                    } catch(Exception a){
+                        throw new IllegalStateException("Cannot find database", a);
+                    }
+                };
+
+            }
+        };
 
         loginGroup.add(usernameText,0,1);
         loginGroup.add(passwordText,0,2);
 
         Button tryToRegister = new Button("register");
+        tryToRegister.setOnAction(loggIn);
         loginGroup.add(tryToRegister, 2,0);
         registration.setScene(new Scene(loginGroup, 500, 500));
-        EventHandler<ActionEvent> loggIn = new EventHandler<>() {
-            public void handle(ActionEvent e) {
 
-                if(password2.getText().equals(password.getText())){
-
-                };
-
-            }
-        };
     }
 
 //    private static void Post(String username, String password) throws Exception{
@@ -142,8 +164,8 @@ public class HelloApplication extends Application {
     public static Connection getConnection() throws Exception{
         try{
             String url = "jdbc:mysql://localhost:3306/PizzaAPI";
-            String username = "root";
-            String password = "SSATAEi2002!123";
+            String username = "abc";
+            String password = "password";
 
             Connection conn = DriverManager.getConnection(url,username,password);
             System.out.println("Connected");

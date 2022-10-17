@@ -1,11 +1,16 @@
-CREATE DATABASE PizzaAPI;
-USE PizzaAPI;
+DROP DATABASE pizzaapi;
+CREATE DATABASE Pizzaapi;
+USE pizzaapi;
+GRANT ALL PRIVILEGES ON pizzaapi TO 'abc'@'localhost' WITH GRANT OPTION;
+SET FOREIGN_KEY_CHECKS=0;
+SET FOREIGN_KEY_CHECKS=1;
 
-CREATE TABLE Customer(Username varchar(12),
-					CustomerPassword varchar(30),
-					Address varchar(50),
-					PhoneNumber varchar(13));
-SELECT * FROM Customer;
+
+CREATE TABLE `pizzaapi`.`customer`(`username` varchar(12),
+					`customerPassword` varchar(30),
+					`address` varchar(50),
+					`phoneNumber` varchar(13));
+SELECT * FROM `customer`;
 
 CREATE TABLE Toppings(ToppingID varchar(4),
                         Sort varchar(30),
