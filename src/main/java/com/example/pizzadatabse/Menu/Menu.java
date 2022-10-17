@@ -2,6 +2,7 @@ package com.example.pizzadatabse.Menu;
 
 
 import com.example.pizzadatabse.Menu.MenuItems.*;
+import com.example.pizzadatabse.Order;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
@@ -20,6 +21,20 @@ import java.util.ArrayList;
 
 public class Menu {
     private static Cart cart = new Cart();
+
+    public static Order takeOrder(){
+
+
+
+
+
+
+
+
+
+        return null;
+    }
+
 
     public static void displayMenu(Stage menuStage) {
         GridPane menuGroup = new GridPane();
@@ -164,8 +179,8 @@ public class Menu {
 
         try {
             String url = "jdbc:mysql://localhost:3306/pizzaapi";
-            String login = "abc";
-            String passwords = "password";
+            String login = "root";
+            String passwords = "SSATAEi2002!123";
             String query = "SELECT * FROM `" + whichData + "`";
 
             Connection conn = DriverManager.getConnection(url, login, passwords);

@@ -15,13 +15,11 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
+import org.w3c.dom.Text;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
+import java.sql.*;
 
 import java.io.IOException;
-import java.sql.PreparedStatement;
-import java.sql.Statement;
 
 public class HelloApplication extends Application {
 
@@ -32,8 +30,8 @@ public class HelloApplication extends Application {
     public void start(Stage login) throws IOException {
         GridPane loginGroup = new GridPane();
         loginGroup.setAlignment(Pos.CENTER);
-        loginGroup.setHgap(15);
-        loginGroup.setVgap(15);
+        loginGroup.setHgap(25);
+        loginGroup.setVgap(25);
         loginGroup.setPadding(new Insets(25, 25, 25, 25));
 
 
@@ -62,9 +60,14 @@ public class HelloApplication extends Application {
         EventHandler<ActionEvent> loggIn = new EventHandler<>() {
             public void handle(ActionEvent e) {
 
-                if(tryToLogin()){
-                    Menu.displayMenu(login);
-                };
+                try {
+                    if(tryToLogin(username, password)){
+                        Menu.displayMenu(login);
+                    }
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+                ;
 
             }
         };
@@ -81,8 +84,11 @@ public class HelloApplication extends Application {
 
     }
 
-    private boolean tryToLogin() {
-        //TODO implement check whether the user is in database
+    private boolean tryToLogin(TextField username, TextField password) throws Exception {
+        Connection conn = getConnection();
+        PreparedStatement ps = conn.prepareStatement("SELECT (`username`,`customer_password`) FROM (?,?)");
+        ps.setString(1, username.getText());
+        ps.setString(2, password.getText());
         return true;
     }
 
@@ -99,32 +105,40 @@ public class HelloApplication extends Application {
         Label usernameText = new Label("insert your username");
         Label passwordText = new Label("insert your password");
         Label passwordText2 = new Label("confirm your password");
-
-
+        Label addressText = new Label("enter your address");
+        Label postcodeText = new Label("enter your postcode");
+        Label phoneNumberText = new Label("enter your phone number");
 
         TextField username = new TextField();
         TextField password = new TextField();
         TextField password2 = new TextField();
+        TextField address = new TextField();
+        TextField postcode = new TextField();
+        TextField phoneNumber = new TextField();
 
         loginGroup.add(username,1,1);
         loginGroup.add(password,1,2);
         loginGroup.add(password2,1,3);
-        loginGroup.add(passwordText2, 0, 3);
+        loginGroup.add(address,1, 4);
+        loginGroup.add(postcode,1, 5);
+        loginGroup.add(phoneNumber, 1, 6);
+
         EventHandler<ActionEvent> loggIn = new EventHandler<>() {
             public void handle(ActionEvent e) {
 
                 if(password2.getText().equals(password.getText())){
                     try{
                         String url = "jdbc:mysql://localhost:3306/pizzaapi";
-                        String login = "abc";
-                        String passwords = "password";
+                        String login = "root";
+                        String passwords = "SSATAEi2002!123";
 
                         Connection conn = DriverManager.getConnection(url,login,passwords);
-                        PreparedStatement stmt = conn.prepareStatement("INSERT INTO customer(`username`, `customer_password`, `address`, `phone_number`) VALUES (?,?,?,?)");
+                        PreparedStatement stmt = conn.prepareStatement("INSERT INTO customer(`username`, `customer_password`, `address`, `postcode`, `phone_number`) VALUES (?,?,?,?,?)");
                         stmt.setString(1, username.getText());
                         stmt.setString(2, password.getText());
-                        stmt.setString(3, "Franek");
-                        stmt.setString(4, "504020123");
+                        stmt.setString(3, address.getText());
+                        stmt.setString(4, phoneNumber.getText());
+                        stmt.setString(5, phoneNumber.getText());
 
 
 
@@ -140,6 +154,10 @@ public class HelloApplication extends Application {
 
         loginGroup.add(usernameText,0,1);
         loginGroup.add(passwordText,0,2);
+        loginGroup.add(passwordText2, 0, 3);
+        loginGroup.add(addressText,0,4);
+        loginGroup.add(postcodeText, 0, 5);
+        loginGroup.add(phoneNumberText, 0, 6);
 
         Button tryToRegister = new Button("register");
         tryToRegister.setOnAction(loggIn);
@@ -147,14 +165,6 @@ public class HelloApplication extends Application {
         registration.setScene(new Scene(loginGroup, 500, 500));
 
     }
-
-//    private static void Post(String username, String password) throws Exception{
-//        try{
-//            Connection Conn = getConnection();
-//        }
-//    }
-
-//    public static Connection getConnection() throws Exception{}
 
     public static void main(String[] args) throws Exception {
         getConnection();
@@ -164,8 +174,8 @@ public class HelloApplication extends Application {
     public static Connection getConnection() throws Exception{
         try{
             String url = "jdbc:mysql://localhost:3306/PizzaAPI";
-            String username = "abc";
-            String password = "password";
+            String username = "root";
+            String password = "SSATAEi2002!123";
 
             Connection conn = DriverManager.getConnection(url,username,password);
             System.out.println("Connected");
