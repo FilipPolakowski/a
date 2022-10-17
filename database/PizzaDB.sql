@@ -1,4 +1,5 @@
 CREATE DATABASE PizzaAPI;
+USE PizzaAPI;
 
 CREATE TABLE Customer(Username varchar(12),
 					CustomerPassword varchar(30),
@@ -27,5 +28,3 @@ CREATE TABLE Orders(ID varchar(4),
                     Dates varchar(10),
                     Times varchar(8));
 SELECT * FROM Orders;
-
-							
