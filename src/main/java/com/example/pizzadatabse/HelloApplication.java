@@ -16,6 +16,8 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 
+import java.sql.*;
+
 import java.io.IOException;
 
 public class HelloApplication extends Application {
@@ -115,13 +117,20 @@ public class HelloApplication extends Application {
             public void handle(ActionEvent e) {
 
                 if(password2.getText().equals(password.getText())){
-                    //TODO implement registration
 
                 };
 
             }
         };
     }
+
+//    private static void Post(String username, String password) throws Exception{
+//        try{
+//            Connection Conn = getConnection();
+//        }
+//    }
+
+//    public static Connection getConnection() throws Exception{}
 
     public static void main(String[] args) {
         launch();

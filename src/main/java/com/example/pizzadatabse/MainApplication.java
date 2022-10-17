@@ -1,4 +1,4 @@
-package com.example.DecentralizedPizzaOrderingApi;
+package com.example.pizzadatabse;
 
 import javafx.application.Application;
 import javafx.event.ActionEvent;

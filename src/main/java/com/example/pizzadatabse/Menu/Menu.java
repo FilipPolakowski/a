@@ -1,9 +1,7 @@
 package com.example.pizzadatabse.Menu;
 
-import java.sql.*;
 
 import com.example.pizzadatabse.Menu.MenuItems.*;
-import com.example.pizzadatabse.Order;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
@@ -17,8 +15,6 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
-import java.time.LocalTime;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 
 public class Menu {
@@ -169,175 +165,20 @@ public class Menu {
         };
         EventHandler<ActionEvent> cartevent = new EventHandler<>() {
             public void handle(ActionEvent e) {
-                Stage cartStage = new Stage();
-                GridPane cartGroup = new GridPane();
-                cartGroup.setHgap(20);
-                cartGroup.setVgap(20);
-                cartGroup.setAlignment(Pos.BASELINE_LEFT);
-
-
-
-
-
-
-
-
-
-
-                //TODO get all pizzas from database and add them to arrayList
-                int counter = 0;
-                for (int i = 0; i < cart.getOrder().size(); i++) {
-                    counter = i+1;
-                    final int a = i;
-                    Label ID = new Label(cart.getOrder().get(i).getID());
-                    ID.setFont(new Font("Arial", 14));
-                    Label Name = new Label(cart.getOrder().get(i).getName());
-                    Name.setFont(new Font("Arial", 14));
-
-                    Label Price = new Label(String.valueOf(cart.getOrder().get(i).getPrice()*1.4*1.09));
-                    Price.setFont(new Font("Arial", 14));
-
-                    cartGroup.add(ID, 1,i);
-
-                    cartGroup.add(Name, 2,i);
-
-                    cartGroup.add(Price, 3,i);
-
-                    EventHandler<ActionEvent> deleteOrder = new EventHandler<>() {
-                        public void handle(ActionEvent e) {
-                            int id = a;
-                            cart.getOrder().remove(id);
-
-                            cartStage.close();
-
-                        }
-                    };
-                    Button delete = new Button("delete");
-                    delete.setOnAction(deleteOrder);
-
-                    cartGroup.add(delete, 4, i);
-
-
-                }
-                EventHandler<ActionEvent> pay = new EventHandler<>() {
-                    public void handle(ActionEvent e) {
-                        cartStage.close();
-                        Stage payment = new Stage();
-                        GridPane  paymen = new GridPane();
-                        paymen.setAlignment(Pos.CENTER);
-                        Label suceesful = new Label("Payment was accepted");
-                        paymen.add(suceesful, 0, 0);
-                        payment.setScene(new Scene(paymen, 300, 300));
-                        payment.show();
-
-                    }
-                };
-                TextField address = new TextField("Enter your address");
-                Button order = new Button("Pay");
-                cartGroup.add(order, 0 , counter);
-                order.setOnAction(pay);
-                Scene pizzaScene = new Scene(cartGroup, 1000, 500);
-                cartStage.setScene(pizzaScene);
-                cartStage.show();
-
             }
         };
-        EventHandler<ActionEvent> orderHistory = new EventHandler<>() {
-            public void handle(ActionEvent e) {
-                Stage ordersStage = new Stage();
-                GridPane ordersGroup = new GridPane();
-                ordersGroup.setHgap(20);
-                ordersGroup.setVgap(20);
-                ordersGroup.setAlignment(Pos.BASELINE_LEFT);
 
-
-
-                ArrayList<Order> ord= new ArrayList<>();
-
-
-
-
-
-                //TODO get all orders of customer starting with active ones from database and add them to arrayList
-                int counter = 0;
-                for (int i = 0; i < ord.size(); i++) {
-                    counter = i+1;
-                    final int a = i;
-                    Label ID = new Label(ord.get(i).getID());
-                    ID.setFont(new Font("Arial", 14));
-                    Label timeWhenOrdered = new Label(ord.get(i).whenOrdered().toString());
-                    timeWhenOrdered.setFont(new Font("Arial", 14));
-
-                    Label Price = new Label(String.valueOf(ord.get(i).getPrice()*1.4*1.09));
-                    Price.setFont(new Font("Arial", 14));
-
-                    ordersGroup.add(ID, 1,i);
-
-                    ordersGroup.add(timeWhenOrdered, 2,i);
-
-                    ordersGroup.add(Price, 3,i);
-
-                    EventHandler<ActionEvent> deleteOrder = new EventHandler<>() {
-                        public void handle(ActionEvent e) {
-                            int id = a;
-                            if(ChronoUnit.MINUTES.between(ord.get(id).whenOrdered(), LocalTime.now())>5) {
-                                //TODO remove order with id a from database
-                            }
-                            else {
-                                Stage tooLate = new Stage();
-                                GridPane tooLateGroup = new GridPane();
-                                tooLateGroup.setHgap(20);
-                                tooLateGroup.setVgap(20);
-                                timeWhenOrdered.setAlignment(Pos.CENTER);
-                                Label toooLate = new Label("You can't cancel and order after 5 minutes.");
-                                tooLateGroup.add(toooLate, 0, 0);
-                                tooLate.setScene(new Scene(tooLateGroup, 100, 200));
-                                tooLate.show();
-
-                            }
-                        }
-                    };
-                    Button delete = new Button("cancel");
-                    delete.setOnAction(deleteOrder);
-
-                    ordersGroup.add(delete, 4, i);
-
-
-                }
-                EventHandler<ActionEvent> pay = new EventHandler<>() {
-                    public void handle(ActionEvent e) {
-                        ordersStage.close();
-                        Stage payment = new Stage();
-                        GridPane  paymen = new GridPane();
-                        paymen.setAlignment(Pos.CENTER);
-                        Label suceesful = new Label("Payment was accepted");
-                        paymen.add(suceesful, 0, 0);
-                        payment.setScene(new Scene(paymen, 300, 300));
-                        payment.show();
-
-                    }
-                };
-                TextField address = new TextField("Enter your address");
-                Button order = new Button("Pay");
-                ordersGroup.add(order, 0 , counter);
-                order.setOnAction(pay);
-                Scene orderScene = new Scene(ordersGroup, 1000, 500);
-                ordersStage.setScene(orderScene);
-                ordersStage.show();
-
-            }
-        };
 
 
         Button pizza = new Button("Pizzas");
         menuGroup.add(pizza, 0,0);
         pizza.setOnAction(pizzas);
 
-        Button deserts = new Button("Deserts and drinks");
+        Button deserts = new Button("Deserts");
         menuGroup.add(deserts, 1,0);
         deserts.setOnAction(desertsAndDrinks);
 
-        Button drinks = new Button("Order history");
+        Button drinks = new Button("Drinks");
         menuGroup.add(drinks, 1,1);
         pizza.setOnAction(pizzas);
 
@@ -345,4 +186,5 @@ public class Menu {
         menuGroup.add(cart, 0,1);
         cart.setOnAction(cartevent);
     }
+    
 }
