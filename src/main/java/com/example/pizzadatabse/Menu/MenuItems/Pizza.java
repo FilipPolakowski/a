@@ -34,7 +34,7 @@ public class Pizza extends  Item{
         for (int i = 0; i < topping.size(); i++) {
             toppings+=(topping.get(i).getName() +", ");
         }
-        toppings = toppings.substring(0, toppings.length()-2);
+
         return toppings;
     }
 
