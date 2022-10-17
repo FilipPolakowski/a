@@ -19,9 +19,10 @@ import java.sql.*;
 import java.util.ArrayList;
 
 public class Menu {
-    private static Cart cart = new Cart();
+    private static Cart cart = new Cart("null");
 
-    public static void displayMenu(Stage menuStage) {
+    public static void displayMenu(Stage menuStage, String userName) {
+        cart = new Cart(userName);
         GridPane menuGroup = new GridPane();
         menuGroup.setAlignment(Pos.CENTER);
         menuGroup.setHgap(15);
@@ -40,7 +41,7 @@ public class Menu {
                 pizzaGroup.setHgap(20);
                 pizzaGroup.setVgap(20);
                 pizzaGroup.setAlignment(Pos.BASELINE_LEFT);
-                ArrayList<Pizza> listOfPizzas = getData("pizza", 3);
+                ArrayList<Pizza> listOfPizzas = getDataPizza("pizza", 3);
 
 
                 //TODO get all pizzas from database and add them to arrayList
@@ -91,13 +92,10 @@ public class Menu {
                 drAndDesGroup.setHgap(20);
                 drAndDesGroup.setVgap(20);
                 drAndDesGroup.setAlignment(Pos.BASELINE_LEFT);
-                ArrayList<Item> listOfDrinksAndDesserts = new ArrayList<>();
+                ArrayList<Item> listOfDrinksAndDesserts = getListOfDrinksAndDeserts();
 
 
-                listOfDrinksAndDesserts.add(new DesertsAndDrinks("Tiramisu", 3, "1"));
-                listOfDrinksAndDesserts.add(new DesertsAndDrinks("Ice Crea,", 4, "1"));
-                listOfDrinksAndDesserts.add(new DesertsAndDrinks("Cola", 2, "2"));
-                listOfDrinksAndDesserts.add(new DesertsAndDrinks("Fanta", 1, "3"));
+
 
 
                 //TODO get all pizzas from database and add them to arrayList
@@ -136,9 +134,127 @@ public class Menu {
 
             }
         };
+        EventHandler<ActionEvent> orderHistory = new EventHandler<>() {
+            public void handle(ActionEvent e) {
+                Stage orderStage = new Stage();
+                GridPane orderGroup = new GridPane();
+                orderGroup.setHgap(20);
+                orderGroup.setVgap(20);
+                orderGroup.setAlignment(Pos.BASELINE_LEFT);
+
+                try {
+                    String url = "jdbc:mysql://localhost:3306/pizzaapi";
+                    String login = "abc";
+                    String passwords = "password";
+                    String query = "SELECT * FROM `orders` WHERE username = \""+userName+"\"";
+                    System.out.println(query);
+
+                    Connection conn = DriverManager.getConnection(url, login, passwords);
+                    PreparedStatement stmt = conn.prepareStatement(query);
+                    ResultSet results = stmt.executeQuery();
+                    int counter= 1;
+                    while (results.next()) {
+                        System.out.println(results.getString(3));
+                        Label ID = new Label(results.getString(1));
+                        ID.setFont(new Font("Arial", 14));
+                        Label Address = new Label(results.getString(3));
+                        Address.setFont(new Font("Arial", 14));
+
+                        Label Price = new Label(Double.toString(cart.calculatePrice() * 1.4 * 1.09));
+                        Price.setFont(new Font("Arial", 14));
+                        EventHandler<ActionEvent> deleteOrder = new EventHandler<>() {
+                            public void handle(ActionEvent e) {
+                                String query2 = "DELETE FROM `orders` WHERE `username` = \""+userName+"\" AND `id` = "+ ID.getText();
+                                try {
+                                    PreparedStatement stmt2 = conn.prepareStatement(query2);
+                                    stmt2.executeUpdate();
+                                    Menu.displayMenu(orderStage, userName);
+                                } catch (SQLException ex) {
+                                    ex.printStackTrace();
+                                }
+
+                            }
+                        };
+                        Button remove = new Button("remove order");
+                        remove.setOnAction(deleteOrder);
+                        orderGroup.add(remove, 3, counter);
+
+
+                        orderGroup.add(ID, 0, counter);
+                        orderGroup.add(Address, 1, counter);
+                        orderGroup.add(Price, 2, counter);
+                        counter++;
+                    }
+
+                } catch (SQLException exception) {
+                    exception.printStackTrace();
+                }
+
+
+                orderStage.setScene(new Scene(orderGroup,500, 500));
+                orderStage.show();
+
+
+
+
+                }
+
+
+            };
         EventHandler<ActionEvent> cartevent = new EventHandler<>() {
             public void handle(ActionEvent e) {
+
+                menuStage.close();
+                Stage cartStage = new Stage();
+                GridPane cartGroup = new GridPane();
+                EventHandler<ActionEvent> placeOrder = new EventHandler<>() {
+                    public void handle(ActionEvent e) {
+                    Stage successfulPayment = new Stage();
+                        try {
+                            cart.placeOrder();
+                        } catch (Exception ex) {
+                            ex.printStackTrace();
+                        }
+                        GridPane pane = new GridPane();
+                    Label payment = new Label("Payment was successful");
+                        EventHandler<ActionEvent> goToActiveOrders = new EventHandler<>() {
+                            public void handle(ActionEvent e) {
+
+                            }
+                        };
+                    Button goToTrackingOrders = new Button("See order history");
+                    goToTrackingOrders.setOnAction(orderHistory);
+                    pane.add(payment,0,0);
+                    pane.add(goToTrackingOrders,0,1);
+                    successfulPayment.setScene(new Scene(pane, 500, 500));
+                    successfulPayment.show();
+                    cartStage.close();
+
+
+                    }
+                };
+                int i = 0;
+                for (i = 0; i < cart.getOrder().size(); i++) {
+                    Label name = new Label(cart.getOrder().get(i).getName());
+                    Label price = new Label(Double.toString(cart.getOrder().get(i).getPrice()));
+                    cartGroup.add(name,0,i);
+                    cartGroup.add(price,1,i);
+
+                }
+                Label totalPrice = new Label(Double.toString(cart.calculatePrice()));
+                cartGroup.add(totalPrice,0,i);
+                Button pay = new Button("Pay");
+                pay.setOnAction(placeOrder);
+                cartGroup.add(pay, 1,i);
+
+                Scene cartScene = new Scene(cartGroup, 500, 500);
+
+                cartStage.setScene(cartScene);
+                cartStage.show();
+
             }
+
+
         };
 
 
@@ -150,16 +266,41 @@ public class Menu {
         menuGroup.add(deserts, 1, 0);
         deserts.setOnAction(desertsAndDrinks);
 
-        Button drinks = new Button("Drinks");
-        menuGroup.add(drinks, 1, 1);
-        pizza.setOnAction(pizzas);
+        Button order_history = new Button("Order history");
+        menuGroup.add(order_history, 1, 1);
+        order_history.setOnAction(orderHistory);
 
         Button cart = new Button("Shopping cart");
         menuGroup.add(cart, 0, 1);
         cart.setOnAction(cartevent);
     }
 
-    public static ArrayList<Pizza> getData(String whichData, int howManyColumns) {
+    private static ArrayList<Item> getListOfDrinksAndDeserts() {
+        ArrayList<Item> drinks = new ArrayList<>();
+        try {
+            String url = "jdbc:mysql://localhost:3306/pizzaapi";
+            String login = "abc";
+            String passwords = "password";
+            String query = "SELECT * FROM `deserts_drinks`";
+
+            Connection conn = DriverManager.getConnection(url, login, passwords);
+            PreparedStatement stmt = conn.prepareStatement(query);
+            ResultSet results = stmt.executeQuery();
+
+            while (results.next()) {
+                System.out.println(results.getString(3));
+                drinks.add(new DesertsAndDrinks(results.getString(2), results.getDouble(3), results.getString(1)));
+
+            }
+
+
+        } catch (Exception a) {
+            throw new IllegalStateException("Cannot find database", a);
+        }
+        return drinks;
+    }
+
+    public static ArrayList<Pizza> getDataPizza(String whichData, int howManyColumns) {
         ArrayList<Pizza> pizzas = new ArrayList<>();
 
         try {
@@ -173,11 +314,9 @@ public class Menu {
             ResultSet results = stmt.executeQuery();
 
             while (results.next()) {
-                pizzas.add(new Pizza(results.getString(1), getDataToppings(results.getString(2)), results.getString(3)));
-                System.out.print(results.getInt(1));
-                System.out.print(": ");
-                System.out.println(results.getString(2));
-                System.out.println(results.getString(3));
+                System.out.println(getDataToppings(results.getString(3)));
+                pizzas.add(new Pizza(results.getString(2), getDataToppings(results.getString(3)), results.getString(1)));
+
 
 
             }
@@ -192,17 +331,23 @@ public class Menu {
     public static ArrayList<Topping> getDataToppings(String whichToppings) {
         ArrayList<Topping> toppings = new ArrayList<>();
         ArrayList<String> strings = new ArrayList<>();
-        for (int i = 0; i < whichToppings.length() / 2; i++) {
-            strings.add(whichToppings.substring(i, i + 1));
+        for (int i = 0; i < whichToppings.length(); i+=2) {
+            strings.add(whichToppings.substring(i, i + 2));
             try {
                 String url = "jdbc:mysql://localhost:3306/pizzaapi";
                 String login = "abc";
                 String passwords = "password";
-                String query = "SELECT " + strings.remove(0) + " FROM  `toppings`";
+                String query = "SELECT * FROM `toppings` WHERE topping_id = "+strings.get(i/2);
+                System.out.println(query);
                 Connection conn = DriverManager.getConnection(url, login, passwords);
                 PreparedStatement stmt = conn.prepareStatement(query);
                 ResultSet results = stmt.executeQuery();
-                toppings.add(new Topping(results.getString(2), results.getDouble(3), results.getInt(4) == 1, results.getString(1)));
+                while(results.next()){
+                    System.out.println(results.getString(3));
+                toppings.add(new Topping(results.getString(2),
+                        results.getDouble(3),
+                        results.getInt(4) == 1,
+                        results.getString(1)));}
             } catch (SQLException e) {
                 e.printStackTrace();
             }
