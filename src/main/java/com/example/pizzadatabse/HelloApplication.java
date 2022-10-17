@@ -21,6 +21,7 @@ import java.sql.*;
 import java.io.IOException;
 
 public class HelloApplication extends Application {
+
     public String lastLogin = "";
     public String lastPassword = "";
 
@@ -133,6 +134,27 @@ public class HelloApplication extends Application {
 //    public static Connection getConnection() throws Exception{}
 
     public static void main(String[] args) {
-        launch();
+        String url = "jdbc:mysql://localhost:3306/PizzaAPI";
+        String username = "root";
+        String password = "SSATAEi2002!123";
+
+        System.out.println("Connecting database...");
+
+        try (Connection connection = DriverManager.getConnection(url, username, password)) {
+            System.out.println("Database connected!");
+        } catch (SQLException e) {
+            throw new IllegalStateException("Cannot connect the database!", e);
+        }
+
+//        System.out.println("Loading driver...");
+//
+//        try {
+//            Class.forName("com.mysql.jdbc.Driver");
+//            System.out.println("Driver loaded!");
+//        } catch (ClassNotFoundException e) {
+//            throw new IllegalStateException("Cannot find the driver in the classpath!", e);
+//        }
+
+//        launch();
     }
 }

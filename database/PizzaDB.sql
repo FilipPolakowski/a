@@ -1,8 +1,5 @@
 CREATE DATABASE PizzaAPI;
 
-CREATE USER 'hello'@'localhost' IDENTIFIED BY 'password';
-GRANT ALL PRIVILEGES ON PizzaAPI.* TO 'hello'@'localhost' IDENTIFIED BY 'password';
-
 CREATE TABLE Customer(Username varchar(12),
 					CustomerPassword varchar(30),
 					Address varchar(50),
@@ -30,4 +27,5 @@ CREATE TABLE Orders(ID varchar(4),
                     Dates varchar(10),
                     Times varchar(8));
 SELECT * FROM Orders;
+
 							
