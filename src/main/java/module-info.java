@@ -1,6 +1,7 @@
 module com.example.pizzadatabse {
     requires javafx.controls;
     requires javafx.fxml;
+    requires java.sql;
 
 
     opens com.example.pizzadatabse to javafx.fxml;
