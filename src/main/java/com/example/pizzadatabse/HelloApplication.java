@@ -16,7 +16,8 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.DriverManager;
 
 import java.io.IOException;
 
@@ -133,28 +134,25 @@ public class HelloApplication extends Application {
 
 //    public static Connection getConnection() throws Exception{}
 
-    public static void main(String[] args) {
-        String url = "jdbc:mysql://localhost:3306/PizzaAPI";
-        String username = "root";
-        String password = "SSATAEi2002!123";
-
-        System.out.println("Connecting database...");
-
-        try (Connection connection = DriverManager.getConnection(url, username, password)) {
-            System.out.println("Database connected!");
-        } catch (SQLException e) {
-            throw new IllegalStateException("Cannot connect the database!", e);
-        }
-
-//        System.out.println("Loading driver...");
-//
-//        try {
-//            Class.forName("com.mysql.jdbc.Driver");
-//            System.out.println("Driver loaded!");
-//        } catch (ClassNotFoundException e) {
-//            throw new IllegalStateException("Cannot find the driver in the classpath!", e);
-//        }
-
+    public static void main(String[] args) throws Exception {
+        getConnection();
 //        launch();
+    }
+
+    public static Connection getConnection() throws Exception{
+        try{
+            String driver = "com.mysql.jdbc.driver";
+            String url = "jdbc:mysql://localhost:3306/PizzaAPI";
+            String username = "root";
+            String password = "SSATAEi2002!123";
+            Class.forName(driver);
+
+            Connection conn = DriverManager.getConnection(url,username,password);
+            System.out.println("Connected");
+
+            return conn;
+        } catch(Exception e){System.out.println(e);}
+
+        return null;
     }
 }
