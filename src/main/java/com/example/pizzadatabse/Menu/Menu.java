@@ -96,7 +96,7 @@ public class Menu {
                 drAndDesGroup.setHgap(20);
                 drAndDesGroup.setVgap(20);
                 drAndDesGroup.setAlignment(Pos.BASELINE_LEFT);
-                ArrayList<Item> listOfDrinksAndDesserts = getListOfDrinksAndDeserts();
+                ArrayList<Item> listOfDrinksAndDesserts = new ArrayList<>();
 
 
 

@@ -4,6 +4,9 @@ import com.example.pizzadatabse.HelloApplication;
 import com.example.pizzadatabse.Menu.MenuItems.Item;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
+
+import java.sql.SQLException;
+import java.time.Duration;
 import java.util.concurrent.ThreadLocalRandom;
 
 import javafx.scene.layout.GridPane;
@@ -13,6 +16,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -23,6 +27,10 @@ public class Cart {
     private String address;
     private String postcode;
     private int counter = 1;
+    private int delivery_status;
+    private LocalTime time;
+    private LocalDate date;
+
 
     public Cart(String userName) {
         this.customerID = userName;
@@ -88,27 +96,54 @@ public class Cart {
         stmt.executeUpdate();
 
     }
+    public void StartDelivery() throws Exception {
 
-    public double calculatePrice() {
+        Connection conn = HelloApplication.getConnection();
+        PreparedStatement stmt = conn.prepareStatement("UPDATE delivery_drivers SET current_order = " + this.counter + " WHERE postcode = (" + this.postcode + ")" );
+        stmt.executeQuery();
+
+    }
+    public void FinishDelivery() throws Exception {
+
+        Connection conn = HelloApplication.getConnection();
+        PreparedStatement stmt = conn.prepareStatement("UPDATE delivery_drivers SET current_order = NULL WHERE postcode = (" + this.postcode + ")" );
+        stmt.executeQuery();
+
+    }
+    public void DeliveryTimer() throws Exception {
+        LocalTime delivery = this.time.plusMinutes(30);
+        Duration duration = Duration.between(this.time, delivery);
+        this.StartDelivery();
+        Thread timer = new Thread(()->{
+            try{
+                delivery_status = 1;
+
+                Connection conn = HelloApplication.getConnection();
+                String id = this.customerID;
+                PreparedStatement stmt = conn.prepareStatement("UPDATE orders SET delivery_status = 1 WHERE id in (" + id + ")" );
+                stmt.setString(1, String.valueOf(delivery_status));
+
+                stmt.executeUpdate();
+                while(this.time.getNano() < delivery.getNano()){
+                    Thread.sleep(duration.toMillis());
+                }
+                this.FinishDelivery();
+
+            }catch(InterruptedException e){
+                System.out.println(e);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
+        timer.start();
+    }
+    private double calculatePrice(){
         double price = 0;
         for (int i = 0; i < dishes.size(); i++) {
             price+=dishes.get(i).getPrice();
         }
         return price;
-    }
-
-    public ArrayList<Item> getOrder() {
-        return dishes;
-    }
-    public String generateCode(){
-        String code = "";
-        for (int i = 0; i < 10; i++) {
-            code+=(ThreadLocalRandom.current().nextInt(0, 8));
-        }
-        return code;
-    }
-
-    public String getUsername() {
-        return this.customerID;
     }
 }

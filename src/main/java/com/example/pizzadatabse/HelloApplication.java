@@ -2,7 +2,6 @@ package com.example.pizzadatabse;
 
 import com.example.pizzadatabse.Menu.Menu;
 import javafx.application.Application;
-import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
@@ -31,8 +30,8 @@ public class HelloApplication extends Application {
     public void start(Stage login) throws IOException {
         GridPane loginGroup = new GridPane();
         loginGroup.setAlignment(Pos.CENTER);
-        loginGroup.setHgap(15);
-        loginGroup.setVgap(15);
+        loginGroup.setHgap(25);
+        loginGroup.setVgap(25);
         loginGroup.setPadding(new Insets(25, 25, 25, 25));
 
 
