@@ -74,10 +74,13 @@ public class Cart{
                 stmt.setString(1, String.valueOf(delivery_status));
 
                 stmt.executeUpdate();
-                while(this.time.getNano() < delivery.getNano()){
+                while(java.time.LocalTime.now().getNano() < delivery.getNano()){
                     Thread.sleep(duration.toMillis());
                 }
                 this.FinishDelivery();
+
+                PreparedStatement stmt2 = conn.prepareStatement("UPDATE orders SET delivery_status = 0 WHERE id in (" + id + ")" );
+                stmt2.setString(1, String.valueOf(delivery_status));
 
             }catch(InterruptedException e){
                 System.out.println(e);
