@@ -64,7 +64,7 @@ public class HelloApplication extends Application {
                     if(tryToLogin(username.getText(), password.getText())){
                         Menu.displayMenu(login, username.getText());
                     }
-                } catch (SQLException ex) {
+                } catch (Exception ex) {
                     ex.printStackTrace();
                 }
                 ;

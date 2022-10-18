@@ -32,8 +32,17 @@ public class Cart {
     private LocalDate date;
 
 
-    public Cart(String userName) {
+    public Cart(String userName) throws Exception {
         this.customerID = userName;
+        Connection conn = HelloApplication.getConnection();
+        time = java.time.LocalTime.now();
+        date = java.time.LocalDate.now();
+        PreparedStatement stmt2 = conn.prepareStatement("SELECT * FROM `customer` WHERE 'username'=\""+customerID+"\"");
+        ResultSet set = stmt2.executeQuery();
+        if(set.next()){
+            address = set.getString(3);
+            postcode = set.getString(4);
+        }
 
     }
 
@@ -94,20 +103,24 @@ public class Cart {
         }
         stmt.setString(7, String.valueOf(counters));
         stmt.executeUpdate();
+        DeliveryTimer();
 
     }
+
+
+
     public void StartDelivery() throws Exception {
 
         Connection conn = HelloApplication.getConnection();
-        PreparedStatement stmt = conn.prepareStatement("UPDATE delivery_drivers SET current_order = " + this.counter + " WHERE postcode = (" + this.postcode + ")" );
-        stmt.executeQuery();
+        PreparedStatement stmt = conn.prepareStatement("UPDATE `delivery_drivers` SET `current_order` = \"" + this.counter + "\" WHERE `postcode` = \"" + this.postcode + "\"" );
+        stmt.execute();
 
     }
     public void FinishDelivery() throws Exception {
 
         Connection conn = HelloApplication.getConnection();
-        PreparedStatement stmt = conn.prepareStatement("UPDATE delivery_drivers SET current_order = NULL WHERE postcode = (" + this.postcode + ")" );
-        stmt.executeQuery();
+        PreparedStatement stmt = conn.prepareStatement("UPDATE `delivery_drivers` SET `current_order` = NULL WHERE postcode = (" + this.postcode + ")" );
+        stmt.execute();
 
     }
     public void DeliveryTimer() throws Exception {
@@ -120,8 +133,7 @@ public class Cart {
 
                 Connection conn = HelloApplication.getConnection();
                 String id = this.customerID;
-                PreparedStatement stmt = conn.prepareStatement("UPDATE orders SET delivery_status = 1 WHERE id in (" + id + ")" );
-                stmt.setString(1, String.valueOf(delivery_status));
+                PreparedStatement stmt = conn.prepareStatement("UPDATE orders SET `deliver_status` = 1 WHERE `username` =\""+id+"\"");
 
                 stmt.executeUpdate();
                 while(this.time.getNano() < delivery.getNano()){
@@ -139,11 +151,26 @@ public class Cart {
         });
         timer.start();
     }
-    private double calculatePrice(){
+    public double calculatePrice(){
         double price = 0;
         for (int i = 0; i < dishes.size(); i++) {
             price+=dishes.get(i).getPrice();
         }
         return price;
+    }
+
+    public List<Item> getOrder() {
+        return this.dishes;
+    }
+    public String generateCode(){
+        String code = "";
+        for (int i = 0; i < 10; i++) {
+            code+=(ThreadLocalRandom.current().nextInt(0, 8));
+        }
+        return code;
+    }
+
+    public String getUsername() {
+        return customerID;
     }
 }

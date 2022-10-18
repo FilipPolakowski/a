@@ -20,10 +20,19 @@ import java.util.ArrayList;
 
 public class Menu {
     private static boolean isDiscountApllied = false;
-    private static Cart cart = new Cart("null");
+    private static Cart cart;
+
+    static {
+        try {
+            cart = new Cart("null");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     private static String userName;
 
-    public static void displayMenu(Stage menuStage, String userName) {
+    public static void displayMenu(Stage menuStage, String userName) throws Exception {
         if(!userName.equals(cart.getUsername())) {
             cart = new Cart(userName);
         }
@@ -175,6 +184,8 @@ public class Menu {
                                     Menu.displayMenu(orderStage, userName);
                                 } catch (SQLException ex) {
                                     ex.printStackTrace();
+                                } catch (Exception ex) {
+                                    ex.printStackTrace();
                                 }
 
                             }
@@ -278,6 +289,8 @@ public class Menu {
 
                                 }
                             } catch (SQLException ex) {
+                                ex.printStackTrace();
+                            } catch (Exception ex) {
                                 ex.printStackTrace();
                             }
                         } catch (SQLException ex) {
