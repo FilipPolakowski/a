@@ -2,6 +2,12 @@ package com.example.pizzadatabse.Menu.MenuItems;
 
 import com.example.pizzadatabse.HelloApplication;
 import com.example.pizzadatabse.Menu.MenuItems.Item;
+import javafx.scene.Scene;
+import javafx.scene.control.Label;
+import java.util.concurrent.ThreadLocalRandom;
+
+import javafx.scene.layout.GridPane;
+import javafx.stage.Stage;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -47,6 +53,20 @@ public class Cart {
                 counter++;
             }
         }
+        if(ammount/10<(ammount+counter)/10){
+            PreparedStatement stmt4 = conn.prepareStatement("INSERT INTO discounts(`id`) VALUES (?)");
+            String discount = generateCode();
+            stmt4.setString(1, discount);
+            Stage stage = new Stage();
+            GridPane pane = new GridPane();
+            Label newCode = new Label("Your new discount code is: ");
+            Label code = new Label(discount);
+            pane.add(newCode,0,0);
+            stmt4.execute();
+            pane.add(code,1,0);
+            stage.setScene(new Scene(pane, 200, 200));
+            stage.show();
+        }
         System.out.println("UPDATE `customer` SET `totalordered`="+(ammount+counter)+" WHERE `username`=\""+customerID+"\"");
 
         PreparedStatement stmt3 = conn.prepareStatement("UPDATE `customer` SET `totalordered`="+(ammount+counter)+" WHERE `username`=\""+customerID+"\"");
@@ -79,5 +99,16 @@ public class Cart {
 
     public ArrayList<Item> getOrder() {
         return dishes;
+    }
+    public String generateCode(){
+        String code = "";
+        for (int i = 0; i < 10; i++) {
+            code+=(ThreadLocalRandom.current().nextInt(0, 8));
+        }
+        return code;
+    }
+
+    public String getUsername() {
+        return this.customerID;
     }
 }

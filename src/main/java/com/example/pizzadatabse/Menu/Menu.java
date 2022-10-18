@@ -19,16 +19,20 @@ import java.sql.*;
 import java.util.ArrayList;
 
 public class Menu {
+    private static boolean isDiscountApllied = false;
     private static Cart cart = new Cart("null");
+    private static String userName;
 
     public static void displayMenu(Stage menuStage, String userName) {
-        cart = new Cart(userName);
+        if(!userName.equals(cart.getUsername())) {
+            cart = new Cart(userName);
+        }
         GridPane menuGroup = new GridPane();
         menuGroup.setAlignment(Pos.CENTER);
         menuGroup.setHgap(15);
         menuGroup.setVgap(15);
         menuGroup.setPadding(new Insets(25, 25, 25, 25));
-
+        Menu.userName = userName;
 
         menuStage.setTitle("Menu");
 
@@ -147,20 +151,20 @@ public class Menu {
                     String login = "abc";
                     String passwords = "password";
                     String query = "SELECT * FROM `orders` WHERE username = \""+userName+"\"";
-                    System.out.println(query);
+
+                    Label Price = new Label(Double.toString(cart.calculatePrice() * 1.4 * 1.09));
+
 
                     Connection conn = DriverManager.getConnection(url, login, passwords);
                     PreparedStatement stmt = conn.prepareStatement(query);
                     ResultSet results = stmt.executeQuery();
                     int counter= 1;
                     while (results.next()) {
-                        System.out.println(results.getString(3));
                         Label ID = new Label(results.getString(1));
                         ID.setFont(new Font("Arial", 14));
                         Label Address = new Label(results.getString(3));
                         Address.setFont(new Font("Arial", 14));
 
-                        Label Price = new Label(Double.toString(cart.calculatePrice() * 1.4 * 1.09));
                         Price.setFont(new Font("Arial", 14));
                         EventHandler<ActionEvent> deleteOrder = new EventHandler<>() {
                             public void handle(ActionEvent e) {
@@ -177,12 +181,11 @@ public class Menu {
                         };
                         Button remove = new Button("remove order");
                         remove.setOnAction(deleteOrder);
-                        orderGroup.add(remove, 3, counter);
+                        orderGroup.add(remove, 2, counter);
 
 
                         orderGroup.add(ID, 0, counter);
                         orderGroup.add(Address, 1, counter);
-                        orderGroup.add(Price, 2, counter);
                         counter++;
                     }
 
@@ -241,8 +244,56 @@ public class Menu {
                     cartGroup.add(price,1,i);
 
                 }
-                Label totalPrice = new Label(Double.toString(cart.calculatePrice()));
-                cartGroup.add(totalPrice,0,i);
+                TextField discount = new TextField();
+                Label Price;
+                if(isDiscountApllied){
+                    Price = new Label(Double.toString(cart.calculatePrice() * 1.4 * 1.09*0.9));
+
+                }
+                else{
+                    Price = new Label(Double.toString(cart.calculatePrice() * 1.4 * 1.09));
+
+                }
+                cartGroup.add(Price, 0, i);
+                EventHandler<ActionEvent> applyDiscount = new EventHandler<>() {
+                    public void handle(ActionEvent e) {
+                        String sql_res= "SELECT * FROM `discounts` WHERE `id`="+discount.getText();
+                        String url = "jdbc:mysql://localhost:3306/pizzaapi";
+                        String login = "abc";
+                        String passwords = "password";
+
+                        try {
+                            Connection conn = DriverManager.getConnection(url, login, passwords);
+
+                            try {
+                                PreparedStatement stmt2 = conn.prepareStatement(sql_res);
+                                ResultSet set = stmt2.executeQuery();
+                                if(set.next()){
+                                    System.out.println("aaa");
+                                    isDiscountApllied = true;
+                                    String query2 = "DELETE FROM `discounts` WHERE `id` = "+discount.getText();
+                                    PreparedStatement stmt5 = conn.prepareStatement(query2);
+                                    Menu.displayMenu(cartStage, userName);
+                                    stmt5.execute();
+
+                                }
+                            } catch (SQLException ex) {
+                                ex.printStackTrace();
+                            }
+                        } catch (SQLException ex) {
+                            ex.printStackTrace();
+                        }
+
+
+
+                    }
+                };
+                Button applyDiscounts = new Button("Apply discount");
+                applyDiscounts.setOnAction(applyDiscount);
+                cartGroup.add(applyDiscounts,2,i);
+                cartGroup.add(discount,1,i);
+
+
                 Button pay = new Button("Pay");
                 pay.setOnAction(placeOrder);
                 cartGroup.add(pay, 1,i);
@@ -288,7 +339,6 @@ public class Menu {
             ResultSet results = stmt.executeQuery();
 
             while (results.next()) {
-                System.out.println(results.getString(3));
                 drinks.add(new DesertsAndDrinks(results.getString(2), results.getDouble(3), results.getString(1)));
 
             }
@@ -314,7 +364,6 @@ public class Menu {
             ResultSet results = stmt.executeQuery();
 
             while (results.next()) {
-                System.out.println(getDataToppings(results.getString(3)));
                 pizzas.add(new Pizza(results.getString(2), getDataToppings(results.getString(3)), results.getString(1)));
 
 
@@ -338,12 +387,10 @@ public class Menu {
                 String login = "abc";
                 String passwords = "password";
                 String query = "SELECT * FROM `toppings` WHERE topping_id = "+strings.get(i/2);
-                System.out.println(query);
                 Connection conn = DriverManager.getConnection(url, login, passwords);
                 PreparedStatement stmt = conn.prepareStatement(query);
                 ResultSet results = stmt.executeQuery();
                 while(results.next()){
-                    System.out.println(results.getString(3));
                 toppings.add(new Topping(results.getString(2),
                         results.getDouble(3),
                         results.getInt(4) == 1,

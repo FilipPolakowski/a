@@ -2,6 +2,7 @@ package com.example.pizzadatabse;
 
 import com.example.pizzadatabse.Menu.Menu;
 import javafx.application.Application;
+import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
@@ -11,6 +12,7 @@ import javafx.scene.Group;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
@@ -122,7 +124,14 @@ public class HelloApplication extends Application {
         TextField password = new TextField();
         TextField password2 = new TextField();
         TextField address = new TextField();
-        TextField postcode = new TextField();
+        ComboBox<String> postcode = new ComboBox();
+        postcode.getItems().add("6221AG");
+        postcode.getItems().add("6221BC");
+        postcode.getItems().add("6221CW");
+        postcode.getItems().add("6221LP");
+
+
+
         TextField phoneNumber = new TextField();
 
         loginGroup.add(username,1,1);
@@ -146,7 +155,7 @@ public class HelloApplication extends Application {
                         stmt.setString(1, username.getText());
                         stmt.setString(2, password.getText());
                         stmt.setString(3, address.getText());
-                        stmt.setString(4, phoneNumber.getText());
+                        stmt.setString(4, postcode.getValue());
                         stmt.setString(5, phoneNumber.getText());
                         stmt.setString(6, "0");
 

@@ -13,6 +13,7 @@ public class Pizza extends  Item{
             }
         }
         this.topping = toppings;
+        this.isPizza = true;
     }
 
     private static double calculatePrice(ArrayList<Topping> toppings) {
