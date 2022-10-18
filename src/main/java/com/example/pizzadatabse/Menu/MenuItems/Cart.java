@@ -60,14 +60,12 @@ public class Cart{
 
     }
 
-    public void DeliveryTimer(){
+    public void DeliveryTimer() throws Exception {
         LocalTime delivery = this.time.plusMinutes(30);
         Duration duration = Duration.between(this.time, delivery);
+        this.StartDelivery();
         Thread timer = new Thread(()->{
             try{
-                while(this.time.getNano() < delivery.getNano()){
-                    Thread.sleep(duration.toMillis());
-                }
                 delivery_status = 1;
 
                 Connection conn = HelloApplication.getConnection();
@@ -76,6 +74,10 @@ public class Cart{
                 stmt.setString(1, String.valueOf(delivery_status));
 
                 stmt.executeUpdate();
+                while(this.time.getNano() < delivery.getNano()){
+                    Thread.sleep(duration.toMillis());
+                }
+                this.FinishDelivery();
 
             }catch(InterruptedException e){
                 System.out.println(e);
@@ -86,6 +88,21 @@ public class Cart{
             }
         });
         timer.start();
+    }
+
+    public void StartDelivery() throws Exception {
+
+        Connection conn = HelloApplication.getConnection();
+        PreparedStatement stmt = conn.prepareStatement("UPDATE delivery_drivers SET current_order = " + this.counter + " WHERE postcode = (" + this.postcode + ")" );
+        stmt.executeQuery();
+
+    }
+    public void FinishDelivery() throws Exception {
+
+        Connection conn = HelloApplication.getConnection();
+        PreparedStatement stmt = conn.prepareStatement("UPDATE delivery_drivers SET current_order = NULL WHERE postcode = (" + this.postcode + ")" );
+        stmt.executeQuery();
+
     }
 
     public ArrayList<Item> getOrder(){

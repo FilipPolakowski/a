@@ -87,9 +87,13 @@ public class HelloApplication extends Application {
     private boolean tryToLogin(TextField username, TextField password) throws Exception {
         Connection conn = getConnection();
         PreparedStatement ps = conn.prepareStatement("SELECT (`username`,`customer_password`) FROM (?,?)");
-        ps.setString(1, username.getText());
-        ps.setString(2, password.getText());
-        return true;
+        ps.executeQuery();
+        ResultSet results = ps.getResultSet();
+        System.out.println(results.getString(1));
+        if(results.getString(1).equals(username.toString()) && results.getString(2).equals(password.toString())){
+            return true;
+        }
+        return false;
     }
 
     private void registerCustomer(Stage registration) {

@@ -1,6 +1,7 @@
 package com.example.pizzadatabse.Menu;
 
 
+import com.example.pizzadatabse.HelloApplication;
 import com.example.pizzadatabse.Menu.MenuItems.*;
 import com.example.pizzadatabse.Order;
 import javafx.event.ActionEvent;
@@ -23,14 +24,6 @@ public class Menu {
     private static Cart cart = new Cart();
 
     public static Order takeOrder(){
-
-
-
-
-
-
-
-
 
         return null;
     }
@@ -178,13 +171,9 @@ public class Menu {
         ArrayList<Pizza> pizzas = new ArrayList<>();
 
         try {
-            String url = "jdbc:mysql://localhost:3306/pizzaapi";
-            String login = "root";
-            String passwords = "SSATAEi2002!123";
-            String query = "SELECT * FROM `" + whichData + "`";
 
-            Connection conn = DriverManager.getConnection(url, login, passwords);
-            PreparedStatement stmt = conn.prepareStatement(query);
+            Connection conn = HelloApplication.getConnection();
+            PreparedStatement stmt = conn.prepareStatement("SELECT * FROM `" + whichData + "`");
             ResultSet results = stmt.executeQuery();
 
             while (results.next()) {
@@ -210,15 +199,13 @@ public class Menu {
         for (int i = 0; i < whichToppings.length() / 2; i++) {
             strings.add(whichToppings.substring(i, i + 1));
             try {
-                String url = "jdbc:mysql://localhost:3306/pizzaapi";
-                String login = "abc";
-                String passwords = "password";
-                String query = "SELECT " + strings.remove(0) + " FROM  `toppings`";
-                Connection conn = DriverManager.getConnection(url, login, passwords);
-                PreparedStatement stmt = conn.prepareStatement(query);
+                Connection conn = HelloApplication.getConnection();
+                PreparedStatement stmt = conn.prepareStatement("SELECT " + strings.remove(0) + " FROM  `toppings`");
                 ResultSet results = stmt.executeQuery();
                 toppings.add(new Topping(results.getString(2), results.getDouble(3), results.getInt(4) == 1, results.getString(1)));
             } catch (SQLException e) {
+                e.printStackTrace();
+            } catch (Exception e) {
                 e.printStackTrace();
             }
 
